@@ -15,6 +15,13 @@ export const getOne = async (userId) => {
 
   return result;
 };
+
+export const remove = async (userId) => {
+  await fetch(`${baseUrl}/${userId}`, {
+    method: "DELETE",
+  });
+};
+
 export const create = async (data) => {
   const body = {
     firstName: data.firstName,

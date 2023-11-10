@@ -3,19 +3,24 @@ import * as userService from "../services/userService";
 import UserItem from "./UserItem";
 import CreateUserModal from "./CreateUserModal";
 import UserInfoModal from "./UserInfoModal";
+import DeleteUserModal from "./DeleteUserModal";
+import Spinner from "./Spinner";
 
 export default function Table() {
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showInfo, setshowInfo] = useState(false);
   const [showDelete, setshowDelete] = useState(false);
   const [selectedUser, setselectedUser] = useState(null);
 
   useEffect(() => {
+    setIsLoading(true);
     userService
       .getAll()
       .then((result) => setUsers(result))
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setIsLoading(false));
   }, []);
 
   const createUserClickHandler = () => {
@@ -41,12 +46,21 @@ export default function Table() {
     setshowInfo(true);
   };
 
+  const deleteUserClickHandler = (userId) => {
+    setselectedUser(userId);
+    setshowDelete(true);
+  };
+
+  const deleteUserHandler = async () => {
+    await userService.remove(selectedUser);
+    setUsers((state) => state.filter((x) => x._id !== selectedUser));
+    setshowDelete(false);
+  };
+
   return (
     <div className="table-wrapper">
       {/*  Overlap components  */}
       {/*  <div className="loading-shade"> */}
-      {/*  Loading spinner  */}
-      {/*  <div className="spinner"></div> */}
       {/*  
         No users added yet  */}
       {/*  <div className="table-overlap">
@@ -107,6 +121,8 @@ export default function Table() {
             </div> */}
       {/*  </div> */}
 
+      {isLoading && <Spinner />}
+
       {showCreate && (
         <CreateUserModal
           onUserCreate={userCreateHandler}
@@ -114,7 +130,18 @@ export default function Table() {
         />
       )}
 
-      {showInfo && <UserInfoModal onClose={() => setshowInfo(false)} userId={selectedUser} />}
+      {showInfo && (
+        <UserInfoModal
+          onClose={() => setshowInfo(false)}
+          userId={selectedUser}
+        />
+      )}
+      {showDelete && (
+        <DeleteUserModal
+          onCloseDelete={() => setshowDelete(false)}
+          onDelete={deleteUserHandler}
+        />
+      )}
       <table className="table">
         <thead>
           <tr>
@@ -218,6 +245,7 @@ export default function Table() {
               key={user._id}
               {...user}
               onUserInfoClick={userInfoClickHandler}
+              onUserDeleteClick={deleteUserClickHandler}
             />
           ))}
         </tbody>
