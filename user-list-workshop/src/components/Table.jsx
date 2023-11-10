@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import * as userService from "../services/userService";
 import UserItem from "./UserItem";
 import CreateUserModal from "./CreateUserModal";
+import UserInfoModal from "./UserInfoModal";
 
 export default function Table() {
   const [users, setUsers] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
+  const [showInfo, setshowInfo] = useState(false);
+  const [showDelete, setshowDelete] = useState(false);
+  const [selectedUser, setselectedUser] = useState(null);
 
   useEffect(() => {
     userService
@@ -22,14 +26,19 @@ export default function Table() {
     setShowCreate(false);
   };
 
-  const UserCreateHandler = async (e) => {
+  const userCreateHandler = async (e) => {
     e.preventDefault();
 
-    
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
-    const result = await userService.create(data);
+    const newUser = await userService.create(data);
+    setUsers((state) => [...state, newUser]);
     setShowCreate(false);
+  };
+
+  const userInfoClickHandler = async (userId) => {
+    setselectedUser(userId);
+    setshowInfo(true);
   };
 
   return (
@@ -97,6 +106,15 @@ export default function Table() {
               <h2>Failed to fetch</h2>
             </div> */}
       {/*  </div> */}
+
+      {showCreate && (
+        <CreateUserModal
+          onUserCreate={userCreateHandler}
+          hideModal={hideCreateUserModal}
+        />
+      )}
+
+      {showInfo && <UserInfoModal onClose={() => setshowInfo(false)} userId={selectedUser} />}
       <table className="table">
         <thead>
           <tr>
@@ -196,19 +214,17 @@ export default function Table() {
         </thead>
         <tbody>
           {users.map((user) => (
-            <UserItem key={user._id} {...user} />
+            <UserItem
+              key={user._id}
+              {...user}
+              onUserInfoClick={userInfoClickHandler}
+            />
           ))}
         </tbody>
       </table>
       <button className="btn-add btn" onClick={createUserClickHandler}>
         Add new user
       </button>
-      {showCreate && (
-        <CreateUserModal
-          onUserCreate={UserCreateHandler}
-          hideModal={hideCreateUserModal}
-        />
-      )}
     </div>
   );
 }

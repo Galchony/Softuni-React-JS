@@ -1,22 +1,22 @@
 import { formatDate } from "../utils/dataUtils";
 
 export default function UserItem({
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    createdAt,
-    imageUrl
+  _id,
+  firstName,
+  lastName,
+  email,
+  phoneNumber,
+  createdAt,
+  imageUrl,
+  onUserInfoClick,
 }) {
- 
+  const infoClickHandler = () => {
+    onUserInfoClick(_id);
+  };
   return (
     <tr>
       <td>
-        <img
-          src={imageUrl}
-          alt={`${firstName}'s profile`}
-          className="image"
-        />
+        <img src={imageUrl} alt={`${firstName}'s profile`} className="image" />
       </td>
       <td>{firstName}</td>
       <td>{lastName}</td>
@@ -59,7 +59,11 @@ export default function UserItem({
             ></path>
           </svg>
         </button>
-        <button className="btn info-btn" title="Info">
+        <button
+          className="btn info-btn"
+          title="Info"
+          onClick={infoClickHandler}
+        >
           <svg
             aria-hidden="true"
             focusable="false"

@@ -8,6 +8,13 @@ export const getAll = async () => {
 
   return data;
 };
+
+export const getOne = async (userId) => {
+  const response = await fetch(`${baseUrl}/${userId}`);
+  const result = await response.json();
+
+  return result;
+};
 export const create = async (data) => {
   const body = {
     firstName: data.firstName,
@@ -20,10 +27,10 @@ export const create = async (data) => {
     address: {
       country: data.country,
       city: data.city,
-      street:data.street ,
+      street: data.street,
       streetNumber: data.streetNumber,
-      }
-  }
+    },
+  };
   const response = await fetch(baseUrl, {
     method: "POST",
     headers: {
@@ -31,6 +38,6 @@ export const create = async (data) => {
     },
     body: JSON.stringify(body),
   });
-
+  const result = await response.json();
+  return result;
 };
-
