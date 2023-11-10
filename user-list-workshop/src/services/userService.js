@@ -1,14 +1,36 @@
-const baseUrl = "http://127.0.0.1:5500/server/data/users.json";
+const baseUrl = "http://localhost:3030/jsonstore/users";
 
 export const getAll = async () => {
-  try {
-    const response = await fetch(baseUrl);
-    const result = await response.json();
+  const response = await fetch(baseUrl);
+  const result = await response.json();
 
-    const data = Object.values(result);
+  const data = Object.values(result);
 
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+  return data;
 };
+export const create = async (data) => {
+  const body = {
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phoneNumber: data.phoneNumber,
+    imageUrl: data.imageUrl,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    address: {
+      country: data.country,
+      city: data.city,
+      street:data.street ,
+      streetNumber: data.streetNumber,
+      }
+  }
+  const response = await fetch(baseUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+};
+

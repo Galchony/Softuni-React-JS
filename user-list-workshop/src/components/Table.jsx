@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import * as userService from "../services/userService";
 import UserItem from "./UserItem";
+import CreateUserModal from "./CreateUserModal";
 
 export default function Table() {
   const [users, setUsers] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
 
-  console.log(users);
   useEffect(() => {
     userService
       .getAll()
@@ -13,16 +14,32 @@ export default function Table() {
       .catch((err) => console.log(err));
   }, []);
 
+  const createUserClickHandler = () => {
+    setShowCreate(true);
+  };
+
+  const hideCreateUserModal = () => {
+    setShowCreate(false);
+  };
+
+  const UserCreateHandler = async (e) => {
+    e.preventDefault();
+
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    const result = await userService.create(data);
+    setShowCreate(false);
+  };
+
   return (
     <div className="table-wrapper">
       {/*  Overlap components  */}
-
       {/*  <div className="loading-shade"> */}
       {/*  Loading spinner  */}
       {/*  <div className="spinner"></div> */}
       {/*  
         No users added yet  */}
-
       {/*  <div className="table-overlap">
               <svg
                 aria-hidden="true"
@@ -41,9 +58,7 @@ export default function Table() {
               </svg>
               <h2>There is no users yet.</h2>
             </div> */}
-
       {/*  No content overlap component  */}
-
       {/*  <div className="table-overlap">
               <svg
                 aria-hidden="true"
@@ -62,9 +77,7 @@ export default function Table() {
               </svg>
               <h2>Sorry, we couldn't find what you're looking for.</h2>
             </div> */}
-
       {/*  On error overlap component  */}
-
       {/*  <div className="table-overlap">
               <svg
                 aria-hidden="true"
@@ -84,7 +97,6 @@ export default function Table() {
               <h2>Failed to fetch</h2>
             </div> */}
       {/*  </div> */}
-
       <table className="table">
         <thead>
           <tr>
@@ -184,10 +196,19 @@ export default function Table() {
         </thead>
         <tbody>
           {users.map((user) => (
-            <UserItem key={user._id} {...user}/>
+            <UserItem key={user._id} {...user} />
           ))}
         </tbody>
       </table>
+      <button className="btn-add btn" onClick={createUserClickHandler}>
+        Add new user
+      </button>
+      {showCreate && (
+        <CreateUserModal
+          onUserCreate={UserCreateHandler}
+          hideModal={hideCreateUserModal}
+        />
+      )}
     </div>
   );
 }
